@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="jquery-1.12.4.js"></script>
+<script src="bootstrap.min.js"></script>
+<link rel="stylesheet" href="bootstrap.min.css">
+</head>
+<body style="background:#000;">
+
+<center><h1 style="color:#fff">Wisher</h1></center>
+
+<form id="form" target="_self" onsubmit="return postToGoogle();" action="" autocomplete="off"> 
+<h3 style="text-align: center !important; color:#fff" >Your Name : </h3>
+<input id="Name1" class="form-control" name="entry.1275836995" placeholder="Your Name" type="text" required> 
+<h3 style="text-align: center !important; color:#fff" >Birthday Boy/Girl Name : </h3>
+<input id="Name2" class="form-control" name="entry.2141428073" placeholder="Birthday Boy/Girl Name" type="text" required> 
+<h3 style="text-align: center !important; color:#fff" >Birthday Wish : </h3>
+<input id="Msg" class="form-control" name="entry.1484984140" placeholder="Birthday Wish" type="text" required>  
+</br>
+<div style="text-align: center !important;">
+<button id="send" class="btn" type="submit" class="common_btn">Submit</button>
+</div>
+</form>
+
+<h3 id="success-msg" style="text-align: center !important; margin-top:190px !important; display:none; color:#fff"> Copy below URL</h3>
+<div id="success-msg1" style="text-align: center !important; margin-top:190px !important; display:none; color:#fff" class="results"></div> 
+
+
+<script>
+function postToGoogle() {
+                var field1 = $("#Name1").val();
+                var field2 = $("#Name2").val();
+                var field3 = $("#Msg").val();
+ 				
+				if(field1 == ""){
+					alert('Please Fill Name1');
+					document.getElementById("Name1").focus();
+					return false;
+				}
+				if(field2 == ""){
+					alert('Please Fill Name2');
+					document.getElementById("Name2").focus();
+					return false;
+				}
+				if(field1 == ""){
+					alert('Please Fill Msg');
+					document.getElementById("Msg").focus();
+					return false;
+				}
+				now = new Date();
+				year = "" + now.getFullYear();
+				month = "" + (now.getMonth() + 1); if (month.length == 1) { month = "0" + month; }
+				day = "" + now.getDate(); if (day.length == 1) { day = "0" + day; }
+				hour = "" + now.getHours(); if (hour.length == 1) { hour = "0" + hour; }
+				minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
+				second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
+				field4 = hour + "" + second + "" + year + "" + day + "" + minute + "" + month;
+
+
+                $.ajax({
+                    url: "https://docs.google.com/forms/u/0/d/e/1FAIpQLSfnWeOiS-UgKoysYYfhBnmplrc9caC7_U4MspAjJ0-OOMDWEQ/formResponse?",
+					data: {"entry.1275836995": field1, "entry.2141428073": field2, "entry.1484984140": field3, "entry.1196362268": field4},
+                    type: "POST",
+                    dataType: "xml",
+                    success: function(d)
+					{
+					},
+					error: function(x, y, z)
+						{
+							
+							
+							$.getJSON("https://spreadsheets.google.com/feeds/list/1NrKDRBAUbiaZBycHQplshm6pflXoDKTJFJmclqBf92A/oo3bqyw/public/values?alt=json", function(data) {
+
+							var sheetData = data.feed.entry;
+							var i;
+							for (i = 0; i < sheetData.length; i++) {	
+							  var YourName = data.feed.entry[i]['gsx$yourname']['$t'];
+							  var BdayName = data.feed.entry[i]['gsx$bdayname']['$t'];
+							  var Wish = data.feed.entry[i]['gsx$wish']['$t'];
+							  var Id = data.feed.entry[i]['gsx$userid']['$t'];
+							  console.log(field4);
+							  if(field4 == Id)
+							  {
+								$('#success-msg').show();
+								$('.results').show();
+								$('#form').hide();
+								var str = location.protocol + '//' + location.host + (location.pathname).replace("Home","Wish")+'?id='+Id;
+								console.log(str);
+								document.getElementById("success-msg1").innerHTML = str ;
+							  }
+							}
+						  });
+						}
+                });
+				return false;
+            }
+</script>
+</body>
+</html>
